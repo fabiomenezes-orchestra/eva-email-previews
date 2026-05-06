@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EVA · Preview de Templates de Email · Style Guide Figma</title>
+<style>
+  :root {
+    --brand: #4A0080;          /* Pigment Indigo (Figma 41:8102) */
+    --brand-dark: #3B0066;
+    --brand-light: #804CA6;
+    --mauve-lightest: #F9F6FF;
+    --mauve-lighter: #F4EDFF;
+    --mauve: #C9A7FF;
+    --bg: #F2F2F2;             /* Neutral Lightest */
+    --surface: #FFFFFF;
+    --text: #0A080D;           /* Neutral Darkest */
+    --text-secondary: #535255;
+    --text-tertiary: #848386;
+    --border: #DAD9DA;
+    --border-light: #F2F2F2;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    padding: 32px 24px 64px;
+  }
+  header.page-header {
+    max-width: 1200px;
+    margin: 0 auto 48px;
+    text-align: center;
+  }
+  header .brand-badge {
+    display: inline-block;
+    background: var(--brand);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+  header h1 {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  header h1 span { color: var(--brand); }
+  header p { color: var(--text-secondary); font-size: 16px; max-width: 640px; margin: 0 auto 8px; }
+  header .meta {
+    display: inline-flex;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 8px 16px;
+    background: var(--mauve-lighter);
+    border: 1px solid var(--mauve);
+    border-radius: 999px;
+    color: var(--brand-dark);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  header .credits {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    letter-spacing: 0.4px;
+  }
+  header .credits code {
+    background: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border-light);
+    color: var(--brand);
+    font-size: 11px;
+  }
+  .container { max-width: 1280px; margin: 0 auto; }
+  .section { margin-bottom: 56px; }
+  .section h2 {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--brand);
+    display: inline-block;
+    letter-spacing: -0.24px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+  }
+  .card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(74, 0, 128, 0.14);
+    border-color: var(--mauve);
+  }
+  .iframe-wrap {
+    position: relative;
+    width: 100%;
+    height: 480px;
+    background: var(--bg);
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .iframe-wrap iframe {
+    width: 600px;
+    height: 1100px;
+    transform: scale(0.6);
+    transform-origin: top left;
+    border: 0;
+    pointer-events: none;
+  }
+  .meta { padding: 18px 20px; }
+  .meta h3 {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    letter-spacing: -0.18px;
+  }
+  .meta .trigger { color: var(--text-secondary); font-size: 13px; margin-bottom: 10px; line-height: 1.4; }
+  .meta .subject {
+    color: var(--text); font-size: 13px;
+    background: var(--mauve-lightest);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border-left: 3px solid var(--mauve);
+  }
+  .meta .slug {
+    color: var(--text-tertiary);
+    font-size: 11px;
+    font-family: ui-monospace, "SF Mono", monospace;
+    letter-spacing: 0.2px;
+  }
+</style>
+</head>
+<body>
+  <header class="page-header">
+    <span class="brand-badge">Style Guide · Figma</span>
+    <h1>Preview · Templates de Email <span>EVA</span></h1>
+    <p>19 renderizações (9 templates × variantes). Header curto consistente, paleta Pigment Indigo oficial, tipografia SF Pro do Style Guide. Click em qualquer card pra abrir em tela cheia.</p>
+    <div class="meta">
+      ✓ Tokens extraídos do Figma node 41:3 (Variables, Typography iOS, Shadows, Radius)
+    </div>
+    <div class="credits">
+      Gerado em 06/05/2026, 09:33:01 ·
+      Cores: <code>#4A0080</code> <code>#5E1A99</code> <code>#C9A7FF</code> · Tipografia: <code>SF Pro</code>
+    </div>
+  </header>
+  <div class="container">
+    
+        <section class="section">
+          <h2>Onboarding</h2>
+          <div class="grid">
+        <a href="./welcome.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./welcome.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Boas-vindas</h3>
+            <p class="trigger">Usuário completa onboarding</p>
+            <p class="subject">📬 Bem-vinda, Maria — vamos começar</p>
+            <p class="slug">welcome.html</p>
+          </div>
+        </a></div>
+        </section>
+        <section class="section">
+          <h2>Saúde</h2>
+          <div class="grid">
+        <a href="./exam-ready-with-alerts.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./exam-ready-with-alerts.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Exame analisado (com alertas)</h3>
+            <p class="trigger">IA terminou de analisar exame com pontos de atenção</p>
+            <p class="subject">📬 Seu exame foi analisado — 2 pontos pra revisar</p>
+            <p class="slug">exam-ready-with-alerts.html</p>
+          </div>
+        </a>
+        <a href="./exam-ready-clean.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./exam-ready-clean.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Exame analisado (tudo OK)</h3>
+            <p class="trigger">IA terminou de analisar exame sem alertas</p>
+            <p class="subject">📬 Seu exame foi analisado — tudo dentro do esperado</p>
+            <p class="slug">exam-ready-clean.html</p>
+          </div>
+        </a></div>
+        </section>
+        <section class="section">
+          <h2>Marketplace</h2>
+          <div class="grid">
+        <a href="./purchase-confirmation.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./purchase-confirmation.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Compra confirmada</h3>
+            <p class="trigger">Pagamento Stripe confirmado</p>
+            <p class="subject">📬 Compra confirmada — Protocolo de Hipertrofia liberado</p>
+            <p class="slug">purchase-confirmation.html</p>
+          </div>
+        </a></div>
+        </section>
+        <section class="section">
+          <h2>Notificação</h2>
+          <div class="grid">
+        <a href="./notification-medium.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./notification-medium.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Convite (medium)</h3>
+            <p class="trigger">Profissional manda convite de care_team</p>
+            <p class="subject">📬 Novo convite do seu nutricionista</p>
+            <p class="slug">notification-medium.html</p>
+          </div>
+        </a>
+        <a href="./notification-high.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./notification-high.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Alerta clínico (high)</h3>
+            <p class="trigger">Cron detecta alerta clínico pendente</p>
+            <p class="subject">📬 Importante: sua adesão caiu nos ultimos 7 dias</p>
+            <p class="slug">notification-high.html</p>
+          </div>
+        </a>
+        <a href="./notification-low.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./notification-low.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Aviso geral (low)</h3>
+            <p class="trigger">Lembrete de evento agendado</p>
+            <p class="subject">📬 Lembrete: consulta com Dr. Pedro amanhã as 14h</p>
+            <p class="slug">notification-low.html</p>
+          </div>
+        </a></div>
+        </section>
+        <section class="section">
+          <h2>Check-in</h2>
+          <div class="grid">
+        <a href="./checkin-morning.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./checkin-morning.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Check-in matinal</h3>
+            <p class="trigger">Cron 8h</p>
+            <p class="subject">📬 Bom dia, Maria — como foi a noite?</p>
+            <p class="slug">checkin-morning.html</p>
+          </div>
+        </a>
+        <a href="./checkin-lunch.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./checkin-lunch.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Check-in almoço</h3>
+            <p class="trigger">Cron 13h</p>
+            <p class="subject">📬 Como tá sendo a manhã?</p>
+            <p class="slug">checkin-lunch.html</p>
+          </div>
+        </a>
+        <a href="./checkin-afternoon.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./checkin-afternoon.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Check-in tarde</h3>
+            <p class="trigger">Cron 18h</p>
+            <p class="subject">📬 Boa tarde — como tá o corpo?</p>
+            <p class="slug">checkin-afternoon.html</p>
+          </div>
+        </a>
+        <a href="./checkin-night.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./checkin-night.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Check-in noite</h3>
+            <p class="trigger">Cron 21h</p>
+            <p class="subject">📬 Boa noite, Maria — como foi o dia?</p>
+            <p class="slug">checkin-night.html</p>
+          </div>
+        </a></div>
+        </section>
+        <section class="section">
+          <h2>Follow-up</h2>
+          <div class="grid">
+        <a href="./followup-workout.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./followup-workout.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Pós-treino</h3>
+            <p class="trigger">2h após workout registrado</p>
+            <p class="subject">📬 Como foi o treino de hoje?</p>
+            <p class="slug">followup-workout.html</p>
+          </div>
+        </a>
+        <a href="./followup-sleep.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./followup-sleep.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Sono noturno</h3>
+            <p class="trigger">Manhã seguinte se sleep < 6h</p>
+            <p class="subject">📬 Você dormiu pouco — tudo bem?</p>
+            <p class="slug">followup-sleep.html</p>
+          </div>
+        </a>
+        <a href="./followup-weight.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./followup-weight.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Pesagem semanal</h3>
+            <p class="trigger">Semanalmente nas segundas</p>
+            <p class="subject">📬 Hora da pesagem semanal</p>
+            <p class="slug">followup-weight.html</p>
+          </div>
+        </a>
+        <a href="./followup-nutrition.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./followup-nutrition.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Refeição registrada</h3>
+            <p class="trigger">30min após refeição registrada</p>
+            <p class="subject">📬 Como você se sentiu após a refeição?</p>
+            <p class="slug">followup-nutrition.html</p>
+          </div>
+        </a>
+        <a href="./followup-hydration.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./followup-hydration.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Hidratação</h3>
+            <p class="trigger">Final da tarde se agua < 60% da meta</p>
+            <p class="subject">📬 Quase no fim do dia — bebeu agua?</p>
+            <p class="slug">followup-hydration.html</p>
+          </div>
+        </a></div>
+        </section>
+        <section class="section">
+          <h2>Resumos</h2>
+          <div class="grid">
+        <a href="./weekly-digest.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./weekly-digest.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Resumo semanal</h3>
+            <p class="trigger">Cron segunda 9h</p>
+            <p class="subject">📬 Sua semana: 18 check-ins, 5 treinos, 12 dias de streak</p>
+            <p class="slug">weekly-digest.html</p>
+          </div>
+        </a>
+        <a href="./monthly-review.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./monthly-review.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Retrospectiva mensal</h3>
+            <p class="trigger">Cron 1o de cada mês</p>
+            <p class="subject">📬 Sua retrospectiva de abril — 87 dias com a EVA</p>
+            <p class="slug">monthly-review.html</p>
+          </div>
+        </a></div>
+        </section>
+        <section class="section">
+          <h2>Protocolos</h2>
+          <div class="grid">
+        <a href="./protocol-ready.html" target="_blank" class="card">
+          <div class="iframe-wrap">
+            <iframe src="./protocol-ready.html" loading="lazy"></iframe>
+          </div>
+          <div class="meta">
+            <h3>Protocolo pronto</h3>
+            <p class="trigger">IA terminou de gerar protocolo</p>
+            <p class="subject">📬 Seu protocolo personalizado tá pronto</p>
+            <p class="slug">protocol-ready.html</p>
+          </div>
+        </a></div>
+        </section>
+  </div>
+</body>
+</html>
