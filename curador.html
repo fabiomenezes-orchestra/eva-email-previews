@@ -1,0 +1,1286 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Curador-Orquestrador da EVA — Como funciona</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  /* Tokens — paleta oficial Figma node 41:3 (Pigment Indigo) */
+  :root {
+    --indigo: #4A0080;
+    --indigo-deep: #2E0050;
+    --seance: #8B47B8;
+    --mauve: #C9A7FF;
+    --mauve-light: #E9D8FF;
+    --paper: #FAFAF8;
+    --paper-warm: #F5F1EB;
+    --ink: #1A1A1A;
+    --ink-soft: #4A4A4A;
+    --ink-muted: #757575;
+    --line: #E5E5E5;
+    --line-soft: #EFEFEF;
+
+    /* Decisao colors */
+    --send: #2E7D32;
+    --modify: #B8860B;
+    --skip: #C62828;
+    --critical: #1565C0;
+
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Inter', -apple-system, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ==== HERO ==== */
+  .hero {
+    background: linear-gradient(135deg, var(--indigo-deep) 0%, var(--indigo) 100%);
+    color: white;
+    padding: 80px 32px 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, var(--mauve) 0%, transparent 70%);
+    opacity: 0.15;
+    border-radius: 50%;
+  }
+  .hero-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .eyebrow {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mauve);
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--mauve);
+  }
+  .hero-lead {
+    font-size: 19px;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 720px;
+    font-weight: 400;
+  }
+  .meta {
+    margin-top: 48px;
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .meta-item strong {
+    display: block;
+    color: var(--mauve);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  /* ==== TOC ==== */
+  .toc {
+    background: var(--paper-warm);
+    padding: 32px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .toc-inner {
+    max-width: 920px;
+    margin: 0 auto;
+  }
+  .toc h2 {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--ink-muted);
+    margin-bottom: 16px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .toc ol {
+    columns: 2;
+    column-gap: 48px;
+    list-style: none;
+    counter-reset: toc;
+  }
+  .toc li {
+    counter-increment: toc;
+    padding: 6px 0;
+    break-inside: avoid;
+  }
+  .toc li::before {
+    content: counter(toc, decimal-leading-zero);
+    font-family: var(--font-mono);
+    color: var(--seance);
+    font-size: 13px;
+    margin-right: 12px;
+    font-weight: 500;
+  }
+  .toc a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 15px;
+  }
+  .toc a:hover {
+    color: var(--indigo);
+  }
+
+  /* ==== SECTION ==== */
+  section {
+    padding: 80px 32px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .section-inner {
+    max-width: 920px;
+    margin: 0 auto;
+  }
+  .section-num {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--seance);
+    margin-bottom: 16px;
+    font-weight: 500;
+  }
+  h2.section-h {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin-bottom: 24px;
+    max-width: 820px;
+  }
+  h2.section-h em {
+    font-style: italic;
+    color: var(--indigo);
+  }
+  .lead {
+    font-size: 19px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin-bottom: 40px;
+    max-width: 720px;
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 500;
+    margin: 48px 0 16px;
+    line-height: 1.25;
+  }
+  h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--seance);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 32px 0 12px;
+  }
+  p { margin-bottom: 16px; font-size: 16px; }
+  ul, ol { padding-left: 24px; margin-bottom: 16px; }
+  ul li, ol li { margin-bottom: 8px; }
+  strong { font-weight: 600; color: var(--ink); }
+  em { font-style: italic; }
+
+  /* ==== QUOTE / CALLOUT ==== */
+  blockquote {
+    border-left: 3px solid var(--seance);
+    padding: 8px 0 8px 24px;
+    margin: 32px 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+  blockquote .attr {
+    display: block;
+    font-family: var(--font-body);
+    font-style: normal;
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-top: 12px;
+  }
+
+  .callout {
+    background: var(--paper-warm);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--indigo);
+    padding: 24px 28px;
+    margin: 32px 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .callout strong:first-child {
+    display: block;
+    color: var(--indigo);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+
+  /* ==== TLDR ==== */
+  .tldr {
+    background: linear-gradient(135deg, var(--mauve-light), var(--paper-warm));
+    padding: 48px 40px;
+    border-radius: 16px;
+    margin: 0 auto;
+    max-width: 920px;
+    margin-top: -50px;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 4px 30px rgba(74, 0, 128, 0.08);
+  }
+  .tldr h2 {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--indigo);
+    margin-bottom: 16px;
+    letter-spacing: 0.1em;
+  }
+  .tldr p {
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 0;
+    color: var(--ink-soft);
+  }
+
+  /* ==== TABLE ==== */
+  .scenario-table, .rules-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 14px;
+  }
+  .scenario-table th, .scenario-table td,
+  .rules-table th, .rules-table td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+  .scenario-table th, .rules-table th {
+    background: var(--paper-warm);
+    font-weight: 600;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    border-bottom: 2px solid var(--line);
+  }
+  .scenario-table tr:hover, .rules-table tr:hover {
+    background: rgba(74, 0, 128, 0.02);
+  }
+  .rules-table .id {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--indigo);
+    width: 60px;
+  }
+  .rules-table .action {
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    width: 100px;
+  }
+  .action.send { color: var(--send); }
+  .action.modify { color: var(--modify); }
+  .action.skip { color: var(--skip); }
+  .action.critical { color: var(--critical); }
+
+  /* ==== BEFORE/AFTER ==== */
+  .ba {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 0;
+    margin: 32px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .ba-side {
+    padding: 24px 28px;
+    background: white;
+  }
+  .ba-side.before {
+    background: #FFF5F5;
+    border-right: 1px solid var(--line);
+  }
+  .ba-side.after {
+    background: #F5FFF7;
+  }
+  .ba-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--paper-warm);
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    color: var(--seance);
+    font-size: 24px;
+  }
+  .ba-side .label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .ba-side.before .label { color: var(--skip); }
+  .ba-side.after .label { color: var(--send); }
+  .ba-side .msg-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .ba-side .msg-body {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+  }
+  .ba-context {
+    grid-column: 1 / -1;
+    padding: 16px 28px;
+    background: var(--paper-warm);
+    font-size: 13px;
+    color: var(--ink-muted);
+    border-top: 1px solid var(--line);
+    font-style: italic;
+  }
+
+  /* ==== FLOW DIAGRAM ==== */
+  .flow {
+    background: var(--paper-warm);
+    border-radius: 16px;
+    padding: 40px;
+    margin: 32px 0;
+  }
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .flow-step:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    left: 19px;
+    top: 44px;
+    bottom: -16px;
+    width: 2px;
+    background: var(--mauve);
+  }
+  .flow-num {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    background: var(--indigo);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 14px;
+    z-index: 1;
+  }
+  .flow-content {
+    flex: 1;
+    padding-top: 6px;
+  }
+  .flow-content strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .flow-content span {
+    font-size: 14px;
+    color: var(--ink-muted);
+  }
+
+  /* ==== CARDS GRID ==== */
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .stat-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .stat-card .label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 8px;
+  }
+  .stat-card .value {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 500;
+    color: var(--indigo);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat-card .desc {
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.5;
+  }
+
+  /* ==== CRON CARDS ==== */
+  .cron-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .cron-item {
+    display: grid;
+    grid-template-columns: 200px 140px 1fr;
+    gap: 24px;
+    padding: 20px 24px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    align-items: center;
+  }
+  .cron-item .name {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--ink);
+  }
+  .cron-item .when {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--seance);
+    background: var(--mauve-light);
+    padding: 4px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    width: fit-content;
+  }
+  .cron-item .change {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+
+  /* ==== SLOT EXAMPLES ==== */
+  .slot-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .slot-row {
+    display: grid;
+    grid-template-columns: 220px 1fr 1.5fr;
+    gap: 20px;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 14px;
+    align-items: center;
+  }
+  .slot-row:last-child { border-bottom: 0; }
+  .slot-row code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: var(--mauve-light);
+    color: var(--indigo);
+    padding: 4px 10px;
+    border-radius: 4px;
+    width: fit-content;
+  }
+  .slot-row .when { color: var(--ink-muted); }
+  .slot-row .example { font-style: italic; color: var(--ink-soft); }
+
+  /* ==== METRICS ==== */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .metric {
+    padding: 24px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    text-align: center;
+  }
+  .metric .num {
+    font-family: var(--font-display);
+    font-size: 42px;
+    font-weight: 500;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .metric .num.send { color: var(--send); }
+  .metric .num.modify { color: var(--modify); }
+  .metric .num.skip { color: var(--skip); }
+  .metric .label {
+    font-size: 12px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+
+  /* ==== TIMELINE ==== */
+  .timeline {
+    border-left: 2px solid var(--mauve);
+    padding-left: 32px;
+    margin: 32px 0 32px 16px;
+  }
+  .timeline-item {
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .timeline-item::before {
+    content: "";
+    position: absolute;
+    left: -40px;
+    top: 6px;
+    width: 14px;
+    height: 14px;
+    background: var(--indigo);
+    border: 3px solid var(--paper);
+    border-radius: 50%;
+  }
+  .timeline-item h4 {
+    margin-top: 0;
+  }
+
+  /* ==== FOOTER ==== */
+  footer {
+    background: var(--ink);
+    color: rgba(255,255,255,0.7);
+    padding: 60px 32px;
+    text-align: center;
+  }
+  footer a {
+    color: var(--mauve);
+    text-decoration: none;
+  }
+  footer a:hover { text-decoration: underline; }
+
+  /* ==== RESPONSIVE ==== */
+  @media (max-width: 768px) {
+    .hero { padding: 60px 20px 80px; }
+    section { padding: 60px 20px; }
+    .toc ol { columns: 1; }
+    .ba { grid-template-columns: 1fr; }
+    .ba-side.before { border-right: 0; border-bottom: 1px solid var(--line); }
+    .ba-arrow { padding: 12px; transform: rotate(90deg); }
+    .cron-item { grid-template-columns: 1fr; gap: 8px; }
+    .slot-row { grid-template-columns: 1fr; gap: 8px; }
+    .tldr { padding: 32px 24px; margin-top: -30px; }
+  }
+
+  /* ==== UTIL ==== */
+  .pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .pill.send { background: #E8F5E9; color: var(--send); }
+  .pill.modify { background: #FFF8E1; color: var(--modify); }
+  .pill.skip { background: #FFEBEE; color: var(--skip); }
+  .pill.critical { background: #E3F2FD; color: var(--critical); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">Fase 5 · Maio 2026</div>
+    <h1>O <em>Curador-Orquestrador</em> da EVA — como cada mensagem automática agora passa por um filtro inteligente.</h1>
+    <p class="hero-lead">
+      Documento para o time de produto, projetos e CS. Explica, sem jargão técnico,
+      a camada que coloca um filtro inteligente entre os 7 robôs que mandam mensagem
+      automaticamente para os usuários e o celular deles.
+    </p>
+    <div class="meta">
+      <div class="meta-item"><strong>Origem</strong>Feedback de produto</div>
+      <div class="meta-item"><strong>Em produção desde</strong>8 de maio de 2026</div>
+      <div class="meta-item"><strong>Cobertura</strong>7 robôs · Push & Email</div>
+      <div class="meta-item"><strong>Painel</strong>/admin/curator</div>
+    </div>
+  </div>
+</header>
+
+<div class="tldr">
+  <h2>// TL;DR — em 5 frases</h2>
+  <p>
+    A EVA tinha um problema reportado pelo time de produto: as mensagens automáticas saíam <strong>descontextualizadas</strong> —
+    uma aluna que disse "machuquei o joelho" recebia 2h depois um push falando "hora do treino pesado, vamo!".
+    A causa: 7 robôs disparam mensagens, cada um monta o texto sozinho sem ler o estado atual da pessoa.
+    O <strong>Curador-Orquestrador</strong> é uma camada nova entre cada robô e o celular do usuário: lê a ficha em tempo real e decide
+    <span class="pill send">manda</span> <span class="pill modify">modifica</span> ou <span class="pill skip">bloqueia</span>.
+    Se nenhuma das 15 regras prontas resolver, uma IA (Claude Haiku) decide o caso. <strong>A partir de agora, nenhuma mensagem automática sai sem passar por esse filtro.</strong>
+  </p>
+</div>
+
+<nav class="toc">
+  <div class="toc-inner">
+    <h2>Índice</h2>
+    <ol>
+      <li><a href="#problema">O problema que estamos resolvendo</a></li>
+      <li><a href="#solucao">A solução em uma frase</a></li>
+      <li><a href="#exemplos">Exemplos reais (antes vs depois)</a></li>
+      <li><a href="#camadas">Como o curador decide (3 camadas)</a></li>
+      <li><a href="#regras">As 15 regras</a></li>
+      <li><a href="#ia">Quando a IA entra (Claude Haiku)</a></li>
+      <li><a href="#storytelling">Storytelling: humanização contextual</a></li>
+      <li><a href="#robos">Os 7 robôs cobertos</a></li>
+      <li><a href="#dashboard">Como acompanhar (dashboard)</a></li>
+      <li><a href="#protecoes">Proteções importantes</a></li>
+      <li><a href="#ajustar">Como ajustar regras sem deploy</a></li>
+      <li><a href="#proximo">Próximos passos</a></li>
+      <li><a href="#limitacoes">Limitações honestas</a></li>
+    </ol>
+  </div>
+</nav>
+
+<section id="problema">
+  <div class="section-inner">
+    <div class="section-num">01 · O problema</div>
+    <h2 class="section-h">O feedback colocou em palavras um <em>desalinhamento estrutural</em> da EVA.</h2>
+    <p class="lead">
+      Existem 8+ robôs disparando mensagens 24h/dia, cada um construído isoladamente — nenhum lê o
+      estado atual da pessoa antes de mandar. Resultado: mensagens chegam em momentos inadequados.
+    </p>
+
+    <blockquote>
+      "Eu falei pra ele que tinha me machucado e estava com dor me recuperando. Mas nas mensagens seguintes vem
+      por email e etc os pedidos ficam até meio desconexos com essa informação que eu dei a ele.
+      Por isso aquele orquestrador que comentamos seria bastante importante pra filtrar qq iniciativa
+      de um agente e adequar antes de disparar. Não só pra controlar fila e frequência, mas também
+      moderar e filtrar para ajustar o conteúdo. Ele deveria ser tipo um curador da melhor jornada possível pro usuário."
+      <span class="attr">— feedback de produto, início de maio/2026</span>
+    </blockquote>
+
+    <h3>Cenários reais que estavam acontecendo</h3>
+
+    <table class="scenario-table">
+      <thead>
+        <tr>
+          <th>Cenário real</th>
+          <th>O que acontecia</th>
+          <th>Como o usuário se sente</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Aluna grávida ouvindo briefing diário com sugestão de protocolo de emagrecimento</td>
+          <td>EVA não sabia que ela tá grávida, mandou genérico</td>
+          <td>"essa app não me entende"</td>
+        </tr>
+        <tr>
+          <td>Idoso de 78 anos recebendo "GO HARD! Sem desculpa!"</td>
+          <td>Tom adolescente padrão pra todo mundo</td>
+          <td>desconfortável, abandona</td>
+        </tr>
+        <tr>
+          <td>Aluno reportou estresse alto na semana, recebe motivação agressiva</td>
+          <td>Estresse não mudou o algoritmo</td>
+          <td>piora o quadro</td>
+        </tr>
+        <tr>
+          <td>Já recebeu 6 pushes hoje, cron manda mais 1</td>
+          <td>Não tem freio</td>
+          <td>desinstala</td>
+        </tr>
+        <tr>
+          <td>Reportou dor lombar 8/10, EVA pergunta "como tá indo o treino?"</td>
+          <td>Insensível</td>
+          <td>quebra confiança</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="solucao">
+  <div class="section-inner">
+    <div class="section-num">02 · A solução em uma frase</div>
+    <h2 class="section-h">Uma <em>supervisora invisível</em> entre cada robô e o celular do usuário.</h2>
+
+    <p>
+      Antes de qualquer mensagem automática sair, ela passa por um curador que lê a "ficha atual da pessoa" e decide:
+      <strong>manda? modifica? bloqueia?</strong>
+    </p>
+
+    <div class="callout">
+      <strong>Analogia</strong>
+      Imagine que cada um dos 8 robôs escreve um post-it com a mensagem que quer mandar e coloca em cima da
+      mesa de uma supervisora experiente. Ela olha rápido a ficha do paciente, lê o post-it, e:
+      <ul style="margin-top:12px">
+        <li>Coloca um carimbo "OK" e manda <em>(a maioria dos casos)</em></li>
+        <li>Reescreve o post-it com tom adequado <em>(o conteúdo é bom, mas o tom precisa ajustar)</em></li>
+        <li>Joga o post-it no lixo <em>(agora não é hora pra isso)</em></li>
+      </ul>
+      <p style="margin-top:12px;margin-bottom:0">
+        Essa supervisora é o curador. <strong>Ela é código — não tem ninguém aprovando push manualmente.</strong>
+        Cada decisão demora ~50 milissegundos.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="exemplos">
+  <div class="section-inner">
+    <div class="section-num">03 · Exemplos reais</div>
+    <h2 class="section-h">O que muda na prática (<em>antes</em> vs <em>depois</em>).</h2>
+
+    <h3>Cenário: aluno com dor lombar reportada hoje cedo</h3>
+    <div class="ba">
+      <div class="ba-side before">
+        <div class="label">Antes — 14h</div>
+        <div class="msg-title">Hora do treino pesado!</div>
+        <div class="msg-body">Bora quebrar tudo na academia hoje! 🔥💪</div>
+      </div>
+      <div class="ba-arrow">→</div>
+      <div class="ba-side after">
+        <div class="label">Depois — Curador (regra R001)</div>
+        <div class="msg-title">Hoje, mobilidade leve 🧘</div>
+        <div class="msg-body">Suas costas estão pedindo cuidado. Que tal 10min de alongamento focado em coluna? Sem carga pesada hoje.</div>
+      </div>
+      <div class="ba-context">
+        Estado da pessoa: dor lombar 7/10 reportada às 9h. Curador detectou e reescreveu mantendo a intenção (lembrete de movimento) mas adequada ao quadro.
+      </div>
+    </div>
+
+    <h3>Cenário: idoso de 73 anos</h3>
+    <div class="ba">
+      <div class="ba-side before">
+        <div class="label">Antes</div>
+        <div class="msg-title">VAMO! Sem desculpa hoje!</div>
+        <div class="msg-body">Hora de quebrar tudo, sem moleza! 🔥💪🔥</div>
+      </div>
+      <div class="ba-arrow">→</div>
+      <div class="ba-side after">
+        <div class="label">Depois — regra R005</div>
+        <div class="msg-title">VAMO</div>
+        <div class="msg-body">Quando se sentir confortável, que tal um movimento suave hoje? Sem pressa, no seu ritmo.</div>
+      </div>
+      <div class="ba-context">
+        Estado da pessoa: faixa etária "elderly". Curador detectou marcadores de tom imperativo no texto e reescreveu em tom respeitoso.
+      </div>
+    </div>
+
+    <h3>Cenário: usuário com 15 dias seguidos de check-in</h3>
+    <div class="ba">
+      <div class="ba-side before">
+        <div class="label">Antes</div>
+        <div class="msg-title">Como foi seu dia?</div>
+        <div class="msg-body">Conta pra mim como vc esta.</div>
+      </div>
+      <div class="ba-arrow">→</div>
+      <div class="ba-side after">
+        <div class="label">Depois — R015 + slot</div>
+        <div class="msg-title">Como foi seu dia?</div>
+        <div class="msg-body">Conta pra mim como vc esta.<br/><br/><strong>15 dias seguidos — duas semanas inteiras 💪</strong></div>
+      </div>
+      <div class="ba-context">
+        Engajamento alto detectado. Curador injetou reconhecimento dinâmico sem precisar mexer no cron de check-in.
+      </div>
+    </div>
+
+    <h3>Cenário: caso "delicado" — IA decide</h3>
+    <div class="ba">
+      <div class="ba-side before">
+        <div class="label">Antes</div>
+        <div class="msg-title">VAMO! Sem desculpa hoje!</div>
+        <div class="msg-body">Hora de quebrar tudo, sem moleza! 🔥💪🔥 GO HARD!</div>
+      </div>
+      <div class="ba-arrow">→</div>
+      <div class="ba-side after">
+        <div class="label">Depois — IA Claude Haiku</div>
+        <div class="msg-title">[mensagem bloqueada]</div>
+        <div class="msg-body" style="font-style:italic">"Usuário com estresse alto e energia baixa por 2 dias não responde bem a tom imperativo/agressivo; mensagem de motivação intensa pode aumentar ansiedade ao invés de ajudar."</div>
+      </div>
+      <div class="ba-context">
+        2 dias de baixa energia (não dispara R014 que exige 3+) + estresse alto. Nenhuma regra pegou. IA detectou a sutileza e bloqueou com justificativa em português.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="camadas">
+  <div class="section-inner">
+    <div class="section-num">04 · As 3 camadas</div>
+    <h2 class="section-h">Como o curador toma decisão.</h2>
+
+    <h3>Camada 1 — A "ficha da pessoa em tempo real"</h3>
+    <p>Para cada usuário, mantemos uma linha atualizada com sinais agregados:</p>
+    <ul>
+      <li><strong>Dor:</strong> tem dor ativa? em qual local? que nível? já dura mais de 1 semana?</li>
+      <li><strong>Recuperação:</strong> tá em recovery de lesão recente?</li>
+      <li><strong>Condições crônicas:</strong> hipertensão? diabetes? lesão antiga ainda ativa?</li>
+      <li><strong>Demografia:</strong> criança? adolescente? adulto? idoso? gestante?</li>
+      <li><strong>Carga física recente:</strong> treinou pesado nas últimas 24h?</li>
+      <li><strong>Bem-estar:</strong> estresse alto na semana? Energia caindo?</li>
+      <li><strong>Engajamento:</strong> quantos pushes recebeu hoje? Streak de check-ins?</li>
+    </ul>
+    <p>Essa ficha é atualizada automaticamente sempre que o usuário reporta algo novo (dor, humor, energia). Demora alguns segundos pra propagar.</p>
+
+    <h3>Camada 2 — As 15 regras determinísticas</h3>
+    <p>Em cima da ficha, rodamos 15 perguntas em ordem. A primeira que se aplica decide o que acontece. <a href="#regras">Veja a lista completa →</a></p>
+
+    <h3>Camada 3 — IA (último recurso)</h3>
+    <p>Se nenhuma regra casar e a mensagem for de tipo "delicado", o curador chama a IA Claude Haiku 4.5 da Anthropic para decidir, com justificativa.</p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-content">
+          <strong>Robô prepara mensagem</strong>
+          <span>Cron gera título + corpo como hoje (ex: "Hora do treino!")</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-content">
+          <strong>Curador lê a ficha</strong>
+          <span>~10ms — busca o estado atual da pessoa</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-content">
+          <strong>Pré-filtros: horário, push_enabled, limite diário</strong>
+          <span>Se push não-crítico em quiet hours (22h-7h) ou já no limite diário → bloqueia direto</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-content">
+          <strong>Avalia 15 regras em ordem de prioridade</strong>
+          <span>Primeira que casa decide. Maioria dos casos passa direto sem regra acionada.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-content">
+          <strong>(opcional) Aciona IA Claude Haiku</strong>
+          <span>Só se nenhuma regra casou E intent é delicado. Cache de 5min reduz custo.</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">6</div>
+        <div class="flow-content">
+          <strong>Resolve slots de storytelling</strong>
+          <span>Adiciona pedaços contextuais (elogio do streak, callback de dor, etc.)</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">7</div>
+        <div class="flow-content">
+          <strong>Registra decisão completa</strong>
+          <span>Snapshot do estado, qual regra disparou, motivo, texto antes/depois</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">8</div>
+        <div class="flow-content">
+          <strong>Mensagem sai (ou não)</strong>
+          <span>Push é despachado pro celular se decisão = manda ou modifica</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="regras">
+  <div class="section-inner">
+    <div class="section-num">05 · Catálogo de regras</div>
+    <h2 class="section-h">As 15 regras determinísticas.</h2>
+    <p class="lead">
+      Avaliadas em ordem de prioridade. A primeira que casa decide o destino da mensagem. Cada regra tem um identificador (R001-R015) que aparece no dashboard.
+    </p>
+
+    <table class="rules-table">
+      <thead>
+        <tr><th>ID</th><th>Pergunta</th><th>Ação</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="id">R012</td><td>Tá tomando 5+ skips seguidos? <em>(quebra anti-silêncio — vem PRIMEIRO)</em></td><td class="action send">Manda forçado</td></tr>
+        <tr><td class="id">R001</td><td>Tem dor lombar/cervical e o cron quer mandar treino pesado?</td><td class="action modify">Modifica pra mobilidade</td></tr>
+        <tr><td class="id">R002</td><td>Tem dor no joelho/tornozelo e o cron quer corrida (impact)?</td><td class="action skip">Bloqueia (risco)</td></tr>
+        <tr><td class="id">R003</td><td>Tá em recuperação e cron quer perguntar dor pós-treino?</td><td class="action skip">Bloqueia (redundante)</td></tr>
+        <tr><td class="id">R004</td><td>Tá em recuperação e cron quer mandar treino?</td><td class="action modify">Modifica pra recuperação ativa</td></tr>
+        <tr><td class="id">R005</td><td>É idoso recebendo mensagem com tom agressivo?</td><td class="action modify">Modifica pra tom respeitoso</td></tr>
+        <tr><td class="id">R006</td><td>É criança recebendo termos clínicos?</td><td class="action modify">Modifica pra linguagem infantil</td></tr>
+        <tr><td class="id">R007</td><td>Tem hipertensão + cardio intenso?</td><td class="action modify">Adiciona aviso de pressão</td></tr>
+        <tr><td class="id">R008</td><td>Tá grávida + protocolo de emagrecimento?</td><td class="action modify">Adequa pra pré-natal</td></tr>
+        <tr><td class="id">R009</td><td>Tá doente + push não-crítico?</td><td class="action skip">Bloqueia (deixa quieto)</td></tr>
+        <tr><td class="id">R010</td><td>Acabou de receber alerta de dor há menos de 2h?</td><td class="action skip">Bloqueia (anti-fadiga)</td></tr>
+        <tr><td class="id">R011</td><td>Já recebeu 3+ pushes hoje + push não-crítico?</td><td class="action skip">Bloqueia (limite)</td></tr>
+        <tr><td class="id">R013</td><td>Treinou pesado nas últimas 24h + cron de treino pesado?</td><td class="action modify">Modifica pra recovery</td></tr>
+        <tr><td class="id">R014</td><td>Energia baixa há 3+ dias + cron motivacional?</td><td class="action modify">Modifica pra tom cuidadoso</td></tr>
+        <tr><td class="id">R015</td><td>7+ dias seguidos de check-in + cron de check-in?</td><td class="action modify">Adiciona elogio do streak</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout" style="margin-top:32px">
+      <strong>Como ajustar uma regra</strong>
+      A equipe consegue desligar ou repriorizar qualquer regra <strong>via banco em segundos</strong>, sem deploy.
+      Se uma regra estiver causando muito skip ou modify ruim, é uma linha de SQL e pronto.
+    </div>
+  </div>
+</section>
+
+<section id="ia">
+  <div class="section-inner">
+    <div class="section-num">06 · Quando a IA entra</div>
+    <h2 class="section-h">A IA é o <em>último recurso</em>, não a primeira ferramenta.</h2>
+
+    <p>Se nenhuma das 15 regras casar <strong>E</strong> a mensagem for de tipo "delicado" (motivacional, milestone, reengajamento, follow-up de protocolo), o curador chama o Claude Haiku 4.5 da Anthropic para decidir.</p>
+
+    <h4>O que a IA recebe</h4>
+    <ul>
+      <li>Resumo do estado atual da pessoa (só campos relevantes ao tipo)</li>
+      <li>Mensagem proposta (título + corpo)</li>
+      <li>Tipo da mensagem</li>
+    </ul>
+
+    <h4>O que a IA retorna</h4>
+    <ul>
+      <li><strong>Mandar como está</strong> — mensagem está adequada</li>
+      <li><strong>Modificar</strong> — mantém intenção mas reescreve título/corpo adequado</li>
+      <li><strong>Bloquear</strong> — momento errado</li>
+    </ul>
+    <p>Sempre com justificativa em uma frase em português.</p>
+
+    <h3>Custo real</h3>
+    <div class="grid-3">
+      <div class="stat-card">
+        <div class="label">Por chamada à IA</div>
+        <div class="value">$0.0008</div>
+        <div class="desc">~R$ 0,004 — equivalente a uma decisão humana de 30 segundos</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Cache hit esperado</div>
+        <div class="value">70%+</div>
+        <div class="desc">Mesma decisão para o mesmo usuário não chama IA novamente em 5 minutos</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Custo estimado</div>
+        <div class="value">R$ 0,60/dia</div>
+        <div class="desc">Para volume de 10.000 pushes/dia. Escala linear.</div>
+      </div>
+    </div>
+
+    <p style="margin-top:24px"><strong>Por que só nos casos delicados:</strong> mensagens rotineiras (lembrete de remédio, lembrete de check-in) não precisam de juízo de valor — regras já dão conta. Disparar IA pra cada push seria caro e desnecessário.</p>
+  </div>
+</section>
+
+<section id="storytelling">
+  <div class="section-inner">
+    <div class="section-num">07 · Storytelling</div>
+    <h2 class="section-h">Como o curador <em>humaniza</em> a mensagem.</h2>
+    <p class="lead">Além de aprovar/modificar/bloquear, o curador pode enriquecer a mensagem com pedaços contextuais chamados <em>slots</em>.</p>
+
+    <div class="slot-list">
+      <div class="slot-row">
+        <code>recent_pain_callback</code>
+        <div class="when">Tem dor reportada nos últimos 7 dias</div>
+        <div class="example">"sua dor lombar 7/10 de quarta"</div>
+      </div>
+      <div class="slot-row">
+        <code>recovery_progress</code>
+        <div class="when">Está em recovery há mais de 6h</div>
+        <div class="example">"estamos cuidando da recuperação"</div>
+      </div>
+      <div class="slot-row">
+        <code>streak_compliment</code>
+        <div class="when">3+ dias seguidos de check-in</div>
+        <div class="example">"15 dias seguidos — duas semanas inteiras 💪"</div>
+      </div>
+      <div class="slot-row">
+        <code>wellbeing_trend</code>
+        <div class="when">Bem-estar subindo nos últimos 7 dias</div>
+        <div class="example">"bem-estar subindo (+1.5 pts essa semana)"</div>
+      </div>
+      <div class="slot-row">
+        <code>last_workout_intensity</code>
+        <div class="when">Treino pesado nas últimas 36h</div>
+        <div class="example">"ontem foi treino pesado"</div>
+      </div>
+      <div class="slot-row">
+        <code>absence_days</code>
+        <div class="when">Sem aparecer há vários dias</div>
+        <div class="example">"faz alguns dias que não te vejo por aqui"</div>
+      </div>
+      <div class="slot-row">
+        <code>condition_aware</code>
+        <div class="when">Tem condição crônica relevante</div>
+        <div class="example">"respeitando sua hipertensão"</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Regra clínica vs. wellness</strong>
+      <strong>Específico em saúde, genérico em wellness.</strong> Decisão tomada com o time:<br/>
+      ✅ Saúde — citar dado clínico é útil: <em>"sua dor lombar 7/10 de quarta — melhorou?"</em><br/>
+      ❌ Emocional — nunca ser específico: <em>"você me contou segunda que estava ansioso"</em> (creepy)<br/>
+      ✅ Wellness genérico tudo bem: <em>"a semana parece estar fluindo bem"</em>
+    </div>
+  </div>
+</section>
+
+<section id="robos">
+  <div class="section-inner">
+    <div class="section-num">08 · Cobertura</div>
+    <h2 class="section-h">Os 7 robôs que agora passam pelo curador.</h2>
+    <p class="lead">Todos disparam em horários diferentes e por motivos diferentes. <strong>Todos chamam o curador antes de mandar.</strong></p>
+
+    <div class="cron-list">
+      <div class="cron-item">
+        <div class="name">Lembretes de check-in</div>
+        <div class="when">8h · 13h · 18h · 21h</div>
+        <div class="change">Não dispara mais pra quem está doente, em recuperação ou já lotado de pushes. Quem tem streak alto recebe elogio dinâmico.</div>
+      </div>
+      <div class="cron-item">
+        <div class="name">Pós-evento (treino/agenda)</div>
+        <div class="when">A cada 5 min</div>
+        <div class="change">Não pergunta de dor pra quem já está em recovery. Adapta tom pra meditação vs treino físico.</div>
+      </div>
+      <div class="cron-item">
+        <div class="name">Alerta de dor pro PT</div>
+        <div class="when">A cada 5 min · <span class="pill critical">crítico</span></div>
+        <div class="change">Crítico — passa sempre. Mas registra no audit log com motivo. Em emergência, sempre chega.</div>
+      </div>
+      <div class="cron-item">
+        <div class="name">Lembrete de medicação</div>
+        <div class="when">Conforme horários · <span class="pill critical">crítico</span></div>
+        <div class="change">Crítico — passa sempre. Saúde é inegociável.</div>
+      </div>
+      <div class="cron-item">
+        <div class="name">Briefings da EVA proativa</div>
+        <div class="when">7h · 10h · 21h</div>
+        <div class="change"><strong>Onde mais mora o problema central.</strong> Agora considera estado emocional, dor, recovery e fadiga antes de mandar mensagem genérica.</div>
+      </div>
+      <div class="cron-item">
+        <div class="name">Jornada (steps de evolução)</div>
+        <div class="when">9h diariamente</div>
+        <div class="change">Pula step se o estado não combina (ex: step de "primeiro treino pesado" não vai pra quem tá machucado).</div>
+      </div>
+      <div class="cron-item">
+        <div class="name">Follow-ups de protocolo</div>
+        <div class="when">10h · 19h</div>
+        <div class="change">Email com follow-up agora é adequado ao momento. Bloqueia se usuário tá doente ou exausto.</div>
+      </div>
+    </div>
+
+    <h4>O que NÃO passa pelo curador (ainda)</h4>
+    <ul>
+      <li><strong>EVA Chat síncrono</strong> — já tem contexto via histórico de conversa, não precisa</li>
+      <li><strong>Notificações dentro do app</strong> (sino) — caminho separado, não foi escopo</li>
+      <li><strong>Email transacional</strong> (recuperação de senha, fatura) — não fazem sentido moderar</li>
+    </ul>
+  </div>
+</section>
+
+<section id="dashboard">
+  <div class="section-inner">
+    <div class="section-num">09 · Dashboard</div>
+    <h2 class="section-h">Como medir se está funcionando.</h2>
+    <p class="lead">Painel administrativo em <code style="font-family:var(--font-mono);font-size:14px;background:var(--mauve-light);padding:2px 8px;border-radius:4px">/admin/curator</code> mostra em tempo real.</p>
+
+    <h3>Cards do topo</h3>
+    <div class="metrics-grid">
+      <div class="metric">
+        <div class="num">2.4k</div>
+        <div class="label">Total Decisões</div>
+      </div>
+      <div class="metric">
+        <div class="num send">52%</div>
+        <div class="label">Send</div>
+      </div>
+      <div class="metric">
+        <div class="num modify">28%</div>
+        <div class="label">Modify</div>
+      </div>
+      <div class="metric">
+        <div class="num skip">20%</div>
+        <div class="label">Skip</div>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--ink-muted);font-style:italic;text-align:center;margin-top:-8px">Valores ilustrativos — visualização do que o painel mostrará após coleta de dados reais.</p>
+
+    <h3>Tabelas de detalhe</h3>
+    <ul>
+      <li><strong>Top regras acionadas:</strong> quais regras estão sendo mais usadas. Se R011 (limite diário) tá disparando muito, talvez o time esteja mandando push demais.</li>
+      <li><strong>Por robô:</strong> quanto cada cron tá tendo de skip/modify. Se um cron específico tá com 50% skip, algo tá errado.</li>
+      <li><strong>Lista detalhada:</strong> cada decisão registrada — clica e expande mostrando mensagem original, mensagem modificada (se aplicável), estado completo do usuário no momento, motivo da decisão.</li>
+    </ul>
+
+    <h3>O que esperar nas primeiras semanas</h3>
+    <table class="scenario-table">
+      <thead>
+        <tr><th>Métrica</th><th>Faixa saudável</th><th>O que indica fora dela</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Taxa de skip global</td><td>15-25%</td><td>Muito acima = regras restritivas demais. Abaixo = filtro fraco.</td></tr>
+        <tr><td>Taxa de modify</td><td>20-35%</td><td>Sweet spot do valor agregado.</td></tr>
+        <tr><td>Taxa de send_as_is</td><td>40-65%</td><td>Maioria dos casos sai sem alteração.</td></tr>
+        <tr><td>Engajamento (resposta a push)</td><td>≥ baseline</td><td>Deveria subir com o tempo, não cair.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="protecoes">
+  <div class="section-inner">
+    <div class="section-num">10 · Proteções</div>
+    <h2 class="section-h">O que <em>nunca</em> pode dar errado.</h2>
+
+    <h4>Fail-open: nunca trava o sistema</h4>
+    <p>Se o curador der erro (banco fora, IA timeout), a mensagem vai como está — nunca bloqueia. O cron continua rodando, só perde a curadoria daquela mensagem específica. Logs de erro são gravados.</p>
+
+    <h4>Crítico bypassa quase tudo</h4>
+    <p>Mensagens críticas (alerta de dor pro PT, lembrete de medicação, alerta clínico) ignoram horário silencioso, ignoram limite diário e ignoram regras de bloqueio. Só passam pelo curador para registro de audit. <strong>Não é aceitável bloquear um lembrete de remédio.</strong></p>
+
+    <h4>Anti-silêncio (R012)</h4>
+    <p>Se o curador bloquear 5 mensagens seguidas de um usuário, a 6ª passa forçada (com flag de aviso). Garante que ninguém suma da experiência da pessoa só porque virou caso difícil.</p>
+
+    <h4>Horário silencioso (22h-7h)</h4>
+    <p>Push não-crítico não dispara entre 22h e 7h horário de Brasília. Mensagens críticas passam normalmente.</p>
+
+    <h4>Auditoria total</h4>
+    <p>Cada decisão fica registrada com snapshot completo do estado do usuário na hora. Se daqui 3 meses alguém apontar "essa mensagem tá errada", a equipe consegue reconstruir exatamente o porquê.</p>
+  </div>
+</section>
+
+<section id="ajustar">
+  <div class="section-inner">
+    <div class="section-num">11 · Ajustes operacionais</div>
+    <h2 class="section-h">Como ajustar regras <em>sem deploy</em>.</h2>
+
+    <p>Pra qualquer pessoa do time com acesso ao banco:</p>
+
+    <h4>Desligar uma regra</h4>
+    <pre style="background:var(--paper-warm);padding:16px 24px;border-radius:8px;font-family:var(--font-mono);font-size:13px;border-left:3px solid var(--indigo)">UPDATE curator_rule SET enabled=false WHERE id='R007';</pre>
+
+    <h4>Mudar prioridade (qual avalia primeiro)</h4>
+    <pre style="background:var(--paper-warm);padding:16px 24px;border-radius:8px;font-family:var(--font-mono);font-size:13px;border-left:3px solid var(--indigo)">UPDATE curator_rule SET priority=5 WHERE id='R015';</pre>
+
+    <h4>Ver últimas decisões de um usuário</h4>
+    <p>No dashboard admin → filtra por user.</p>
+
+    <h4>Desligar curador inteiro pra um robô (emergência)</h4>
+    <p>Editar 1 linha de código no robô e fazer redeploy. Não temos uma flag de emergência via banco (não foi escopo). Se virar necessidade, fazemos.</p>
+  </div>
+</section>
+
+<section id="proximo">
+  <div class="section-inner">
+    <div class="section-num">12 · Roadmap</div>
+    <h2 class="section-h">O que vem em seguida.</h2>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <h4>Próximos 14 dias</h4>
+        <p><strong>Calibragem das regras</strong> baseada em dados reais. Provavelmente alguns thresholds vão precisar ajuste (ex: low_energy threshold de 3 dias pode ser muito estrito).</p>
+        <p><strong>Acompanhamento de KPI:</strong> taxa de resposta a push, NPS de mensagens automáticas, reclamações específicas.</p>
+      </div>
+
+      <div class="timeline-item">
+        <h4>Próximos 1-3 meses</h4>
+        <p><strong>Email passar pelo curador</strong> (hoje só push passa). Trabalho menor — tem 1 cron de email que ainda não foi integrado.</p>
+        <p><strong>Mais sinais na ficha:</strong> sono insuficiente recente, dieta restritiva ativa, padrão de horário do usuário.</p>
+        <p><strong>Regras por persona:</strong> hoje tudo é universal. Pode fazer sentido criar conjuntos diferentes pra "atleta competitivo" vs "iniciante 60+".</p>
+      </div>
+
+      <div class="timeline-item">
+        <h4>Próximos 3-6 meses (se virar prioridade)</h4>
+        <p><strong>A/B test do curador:</strong> rodar 50% com curador, 50% sem, e medir engajamento e churn de cada grupo.</p>
+        <p><strong>Regras editáveis pelo PT:</strong> "esse aluno meu nunca recebe mensagem motivacional agressiva, ele odeia". Funcionalidade não trivial, mas valor claro.</p>
+        <p><strong>Curador no chat síncrono:</strong> quando o usuário fala com a EVA em tempo real, o curador pode também moderar respostas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="limitacoes">
+  <div class="section-inner">
+    <div class="section-num">13 · Limitações honestas</div>
+    <h2 class="section-h">Não é mágica — algumas verdades pra calibrar expectativa.</h2>
+
+    <ul>
+      <li><strong>As 15 regras cobrem cenários comuns, não tudo.</strong> Vão aparecer casos esquisitos que nenhuma regra pega — aí depende da IA, que também não é perfeita.</li>
+      <li><strong>A "ficha do usuário" depende do que o usuário reporta.</strong> Se ele não diz que tá com dor, o curador não sabe. Não inventamos sinais.</li>
+      <li><strong>A IA pode errar.</strong> Estimamos 70% de cache hit, então 30% das vezes ela toma decisão fresca. Numa amostra de 100 decisões delicadas, espera-se ~5 que poderiam ter sido melhores. O dashboard ajuda a achar essas e ajustar.</li>
+      <li><strong>Perda de contexto inter-cron.</strong> Se o cron A skipou e o cron B 2h depois manda algo similar, hoje o curador trata cada decisão isoladamente. Não tem memória entre crons. É refinamento futuro.</li>
+      <li><strong>Não cobre canais de fora do nosso sistema.</strong> Campanhas de marketing externas (Mailchimp, RD Station) não passam pelo curador. Só o que sai pela EVA mesmo.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <p>Documento de produto · Curador-Orquestrador · 8 de maio de 2026</p>
+  <p style="margin-top:12px;font-size:13px">
+    Documentação técnica completa: <code style="color:var(--mauve)">docs/FASE-5-CURADOR-ORQUESTRADOR-2026-05-08.md</code><br/>
+    Dashboard de monitoramento: <a href="https://eva-lifeos.web.app/admin/curator">eva-lifeos.web.app/admin/curator</a>
+  </p>
+  <p style="margin-top:24px;opacity:0.5;font-size:12px">Dúvidas: time de engenharia · #orchestra-eng</p>
+</footer>
+
+</body>
+</html>
